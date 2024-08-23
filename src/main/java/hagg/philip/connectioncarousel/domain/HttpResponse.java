@@ -1,4 +1,4 @@
-package hagg.philip.connectioncarousel.service;
+package hagg.philip.connectioncarousel.domain;
 
 import lombok.Getter;
 import lombok.Setter;

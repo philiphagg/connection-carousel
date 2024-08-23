@@ -1,4 +1,4 @@
-package hagg.philip.connectioncarousel.service;
+package hagg.philip.connectioncarousel.domain;
 
 public class HttpRequest {
     private final String path;

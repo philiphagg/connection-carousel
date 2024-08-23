@@ -1,11 +1,14 @@
-package hagg.philip.connectioncarousel.service;
+package hagg.philip.connectioncarousel.domain;
+
+import hagg.philip.connectioncarousel.domain.HttpRequest;
+import hagg.philip.connectioncarousel.domain.HttpResponse;
 
 import java.net.URL;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ServiceInstance {
-    URL url;
-    boolean isAlive;
+    public URL url;
+    public boolean isAlive;
     final ReentrantReadWriteLock lock;
     Object reverseProxy;
 
@@ -28,8 +31,7 @@ public class ServiceInstance {
     public boolean isAlive() {
         lock.readLock().lock();
         try {
-            System.out.println("isAlive: " + this.isAlive);
-            return this.isAlive == true;
+            return this.isAlive;
         } finally {
             lock.readLock().unlock();
         }

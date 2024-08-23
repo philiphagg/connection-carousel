@@ -1,12 +1,13 @@
-package hagg.philip.connectioncarousel.service;
+package hagg.philip.connectioncarousel.balance;
 
+import hagg.philip.connectioncarousel.domain.ServiceInstance;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ServiceInstanceTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void testServiceInstance() {
         ServiceInstance serviceInstance = new ServiceInstance(null);
         assertNotNull(serviceInstance);
