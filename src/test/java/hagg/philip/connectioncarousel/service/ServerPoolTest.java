@@ -43,7 +43,7 @@ class ServerPoolTest {
 
     @Test
     @SneakyThrows
-    void getNextPeer(){
+    void getNextPeer() {
         ServiceInstance firstServiceInstance = new ServiceInstance(URI.create("http://www.google.se").toURL());
         ServiceInstance secondServiceInstance = new ServiceInstance(URI.create("http://www.facebook.se").toURL());
         ServiceInstance expected = new ServiceInstance(URI.create("http://www.amazon.se").toURL());
@@ -60,7 +60,7 @@ class ServerPoolTest {
 
     @Test
     @SneakyThrows
-    void markAsDead(){
+    void markAsDead() {
         ServiceInstance firstServiceInstance = new ServiceInstance(URI.create("http://www.google.se").toURL());
         ServiceInstance secondServiceInstance = new ServiceInstance(URI.create("http://www.facebook.se").toURL());
 
@@ -92,5 +92,23 @@ class ServerPoolTest {
         assertTrue(third.isAlive());
     }
 
+    @Test
+    @SneakyThrows
+    void testLoadBalancing() {
+        ServiceInstance first = new ServiceInstance(new URL("http://www.google.com"));
+        ServiceInstance second = new ServiceInstance(new URL("http://www.facebook.com"));
+        ServiceInstance third = new ServiceInstance(new URL("http://www.amazon.com"));
 
+        second.setAlive(false); // Simulate that Facebook is down
+
+        ServerPool serverPool = new ServerPool(first, second, third);
+
+        HttpRequest request = new HttpRequest("/path");
+        HttpResponse response = new HttpResponse();
+
+        serverPool.roundRobinBalance(request, response);
+
+        assertEquals(200, response.getStatusCode());
+        assertEquals("Hello from http://www.amazon.com", response.getBody());
+    }
 }

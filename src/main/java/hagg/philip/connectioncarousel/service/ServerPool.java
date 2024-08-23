@@ -1,8 +1,15 @@
 package hagg.philip.connectioncarousel.service;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
+@Setter
+@Getter
 public class ServerPool {
+    private final int MAX_ATTEMPTS = 3;
     List<ServiceInstance> instances;
     int current;
 
@@ -25,22 +32,6 @@ public class ServerPool {
 
     public void addInstance(ServiceInstance instance) {
         instances.add(instance);
-    }
-
-    public List<ServiceInstance> getInstances() {
-        return instances;
-    }
-
-    public void setInstances(List<ServiceInstance> instances) {
-        this.instances = instances;
-    }
-
-    public int getCurrent() {
-        return current;
-    }
-
-    public void setCurrent(int current) {
-        this.current = current;
     }
 
     public ServiceInstance getNextPeer() {
@@ -68,7 +59,21 @@ public class ServerPool {
         return Math.random() < (2.0 / 3.0);
     }
 
-    public void roundRobinBalance(){
+    public void roundRobinBalance(HttpRequest request, HttpResponse response){
+        int attemtps = 0;
+        while(attemtps < MAX_ATTEMPTS){
+            ServiceInstance instance = getNextPeer();
 
+            if(instance == null){
+                response.setStatusCode(503);
+                response.setBody("All services are dead");
+                return;
+            }
+            if(instance.serve(request, response)){
+                return;
+            }
+            markAsDead(instance);
+            attemtps++;
+        }
     }
 }

@@ -34,4 +34,23 @@ public class ServiceInstance {
             lock.readLock().unlock();
         }
     }
+
+    public boolean serve(HttpRequest request, HttpResponse response) {
+        lock.readLock().lock();
+        try {
+            if (isAlive()) {
+                System.out.println("Serving request: " + request.getPath());
+                response.setStatusCode(200);
+                response.setBody("Hello from " + url);
+                return true;
+            } else {
+                System.out.println("Service is dead: " + url);
+                response.setStatusCode(503);
+                response.setBody("Service is dead: " + url);
+                return false;
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
 }
