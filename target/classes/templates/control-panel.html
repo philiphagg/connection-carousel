@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Load Balancer Admin Panel</title>
+</head>
+<body>
+<h1>Load Balancer Admin Panel</h1>
+
+<h2>Load Balancer Strategies</h2>
+<form th:action="@{/admin/toggle-strategy}" method="post">
+    <ul>
+        <li th:each="strategy : ${strategies}">
+            <input type="radio" th:checked="${strategy.active}" th:value="${strategy.name}" name="name">
+            <label th:text="${strategy.name}"></label>
+        </li>
+    </ul>
+    <button type="submit">Set Active Strategy</button>
+</form>
+
+<h2>Server Instances</h2>
+<form th:action="@{/admin/toggle-instance}" method="post">
+    <ul>
+        <li th:each="instance : ${instances}">
+            <input type="radio" th:checked="${instance.alive}" th:value="${instance.url}" name="url">
+            <label th:text="${instance.url}"></label>
+        </li>
+    </ul>
+    <button type="submit">Kill instance</button>
+</form>
+
+<h3>Add New Instance</h3>
+<form th:action="@{/admin/add-instance}" method="post">
+    <input type="text" name="url" placeholder="http://example.com">
+    <button type="submit">Add Instance</button>
+</form>
+
+<h3>Remove Instance</h3>
+<form th:action="@{/admin/remove-instance}" method="post">
+    <select name="url">
+        <option th:each="instance : ${instances}" th:value="${instance.url}" th:text="${instance.url}"></option>
+    </select>
+    <button type="submit">Remove Instance</button>
+</form>
+</body>
+</html>

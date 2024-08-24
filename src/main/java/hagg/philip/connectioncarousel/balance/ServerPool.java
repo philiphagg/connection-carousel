@@ -3,8 +3,10 @@ package hagg.philip.connectioncarousel.balance;
 import hagg.philip.connectioncarousel.balance.strategy.LoadBalancingStrategy;
 import hagg.philip.connectioncarousel.domain.HttpRequest;
 import hagg.philip.connectioncarousel.domain.HttpResponse;
+import hagg.philip.connectioncarousel.domain.NoActiveStrategyException;
 import hagg.philip.connectioncarousel.domain.ServiceInstance;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,42 +19,16 @@ public class ServerPool {
 
     @Getter
     List<ServiceInstance> instances;
-    private final LoadBalancingStrategy strategy;
+    private final List<LoadBalancingStrategy> strategies;
 
-    public ServerPool(List<ServiceInstance> instances, LoadBalancingStrategy strategy) {
-        this.instances = instances;
-        this.strategy = strategy;
+    @Autowired
+    public ServerPool(List<ServiceInstance> instances, List<LoadBalancingStrategy> strategies) {
+        this.instances = new ArrayList<>(instances);
+        this.strategies = strategies;
     }
 
-    public ServerPool(LoadBalancingStrategy strategy, ServiceInstance... instances) {
-        this(Arrays.asList(instances), strategy);
-    }
-
-    public ServerPool(LoadBalancingStrategy strategy) {
-        this.instances = new ArrayList<>();
-        this.strategy = strategy;
-    }
-
-    public void addInstance(ServiceInstance instance) {
-        instances.add(instance);
-    }
-
-    public ServiceInstance getNextPeer() {
-        return strategy.selectInstance(instances);
-    }
-
-    public void markAsDead(ServiceInstance secondServiceInstance) {
-        secondServiceInstance.setAlive(false);
-    }
-
-    public void halthCheck() {
-        for (ServiceInstance instance : instances) {
-            instance.setAlive(ping(instance));
-        }
-    }
-
-    protected boolean ping(ServiceInstance instance) {
-        return Math.random() < (2.0 / 3.0);
+    public ServerPool(List<LoadBalancingStrategy> strategies, ServiceInstance... instances) {
+        this(new ArrayList<>(Arrays.asList(instances)), strategies);
     }
 
     public void balanceRequest(HttpRequest request, HttpResponse response) {
@@ -81,4 +57,36 @@ public class ServerPool {
         System.out.println("Service not available after retries");
         response.setBody("Service not available after retries");
     }
+
+
+    public void addInstance(ServiceInstance instance) {
+        instances.add(instance);
+    }
+
+    public void removeInstance(String url) {
+        instances.removeIf(instance -> String.valueOf(instance.getUrl()).equals(url));
+    }
+
+    public ServiceInstance getNextPeer() {
+        return strategies.stream()
+                .filter(LoadBalancingStrategy::isActive)
+                .findFirst()
+                .orElseThrow(NoActiveStrategyException::new)
+                .selectInstance(instances);
+    }
+
+    public void markAsDead(ServiceInstance instance) {
+        instance.setAlive(false);
+    }
+
+    public void halthCheck() {
+        for (ServiceInstance instance : instances) {
+            instance.setAlive(ping(instance));
+        }
+    }
+
+    public boolean ping(ServiceInstance instance) {
+        return Math.random() < (2.0 / 3.0);
+    }
+
 }
