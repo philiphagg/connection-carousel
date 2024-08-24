@@ -2,11 +2,13 @@ package hagg.philip.connectioncarousel.domain;
 
 import hagg.philip.connectioncarousel.domain.HttpRequest;
 import hagg.philip.connectioncarousel.domain.HttpResponse;
+import lombok.Getter;
 
 import java.net.URL;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ServiceInstance {
+    @Getter
     public URL url;
     public boolean isAlive;
     final ReentrantReadWriteLock lock;
@@ -23,6 +25,7 @@ public class ServiceInstance {
         lock.writeLock().lock();
         try {
             this.isAlive = alive;
+            System.out.println("Service " + url + " is now " + (alive ? "alive" : "dead"));
         } finally {
             lock.writeLock().unlock();
         }

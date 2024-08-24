@@ -3,6 +3,7 @@ package hagg.philip.connectioncarousel.balance.api;
 import hagg.philip.connectioncarousel.balance.ServerPool;
 import hagg.philip.connectioncarousel.domain.HttpRequest;
 import hagg.philip.connectioncarousel.domain.HttpResponse;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class Controller {
+
     private final ServerPool serverPool;
 
     @GetMapping("/load-balance")

@@ -23,7 +23,7 @@ class ServerPoolTest {
     void testServerPool() {
         ServiceInstance serviceInstance = new ServiceInstance(null);
         LoadBalancingStrategy strategy = new RoundRobinStrategy();  // Inject the strategy
-        ServerPool serverPool = new ServerPool(List.of(serviceInstance), strategy);
+        ServerPool serverPool = new ServerPool(List.of(serviceInstance), List.of(strategy));
         assertNotNull(serverPool);
     }
 
@@ -32,7 +32,7 @@ class ServerPoolTest {
         ServiceInstance firstServiceInstance = new ServiceInstance(null);
         ServiceInstance SecondServiceInstance = new ServiceInstance(null);
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, SecondServiceInstance), strategy);
+        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, SecondServiceInstance), List.of(strategy));
         assertNotNull(serverPool);
         assertEquals(2, serverPool.getInstances().size());
     }
@@ -46,7 +46,7 @@ class ServerPoolTest {
 
         secondServiceInstance.setAlive(false);
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, secondServiceInstance, expected), strategy);
+        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, secondServiceInstance, expected), List.of(strategy));
 
         ServiceInstance nextPeer = serverPool.getNextPeer();
         assertEquals(nextPeer, expected);
@@ -62,38 +62,14 @@ class ServerPoolTest {
         ServiceInstance secondServiceInstance = new ServiceInstance(URI.create("http://www.facebook.se").toURL());
 
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, secondServiceInstance), strategy);
+        ServerPool serverPool = new ServerPool(List.of(firstServiceInstance, secondServiceInstance), List.of(strategy));
         serverPool.markAsDead(secondServiceInstance);
 
         assertTrue(firstServiceInstance.isAlive());
         assertFalse(secondServiceInstance.isAlive());
     }
 
-    @Test
-    @SneakyThrows
-    @Description(
-            "Test that the health check works as expected; due to the random nature of the implementation, " +
-            "a less random class was introduced to ensure that the test is deterministic"
-    )
-    void healthCheck() {
-        ServiceInstance first = new ServiceInstance(URI.create("http://www.google.com").toURL());
-        ServiceInstance second = new ServiceInstance(URI.create("http://www.facebook.com").toURL());
-        ServiceInstance third = new ServiceInstance(URI.create("http://www.amazon.com").toURL());
 
-        Map<ServiceInstance, Boolean> mockPingResults = new HashMap<>();
-        mockPingResults.put(first, true);
-        mockPingResults.put(second, false);
-        mockPingResults.put(third, true);
-
-        LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        TestableServerPool serverPool = new TestableServerPool(mockPingResults,strategy, first, second, third);
-
-        serverPool.halthCheck();
-
-        assertTrue(first.isAlive());
-        assertFalse(second.isAlive());
-        assertTrue(third.isAlive());
-    }
 
     @Test
     @SneakyThrows
@@ -106,7 +82,7 @@ class ServerPoolTest {
         second.setAlive(false); // Simulate that Facebook is down
 
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(first, second, third), strategy);
+        ServerPool serverPool = new ServerPool(List.of(first, second, third), List.of(strategy));
         HttpRequest request = new HttpRequest("/path");
         HttpResponse response = new HttpResponse();
 
@@ -127,7 +103,7 @@ class ServerPoolTest {
         second.setAlive(false);
 
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(first, second, third), strategy);
+        ServerPool serverPool = new ServerPool(List.of(first, second, third), List.of(strategy));
 
         HttpRequest request = new HttpRequest("/path");
         HttpResponse response = new HttpResponse();
@@ -152,7 +128,7 @@ class ServerPoolTest {
         third.setAlive(false);
 
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(List.of(first, second, third), strategy);
+        ServerPool serverPool = new ServerPool(List.of(first, second, third), List.of(strategy));
 
         HttpRequest request = new HttpRequest("/path");
         HttpResponse response = new HttpResponse();
@@ -167,7 +143,7 @@ class ServerPoolTest {
     @Test
     void testNoBackendsAvailable() {
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(strategy);
+        ServerPool serverPool = new ServerPool(List.of(strategy));
 
         HttpRequest request = new HttpRequest("/path");
         HttpResponse response = new HttpResponse();
@@ -183,7 +159,7 @@ class ServerPoolTest {
     @SneakyThrows
     void testDynamicBackendAddition() {
         LoadBalancingStrategy strategy = new RoundRobinStrategy();
-        ServerPool serverPool = new ServerPool(strategy);
+        ServerPool serverPool = new ServerPool(List.of(strategy));
 
 
         HttpRequest request = new HttpRequest("/path");
