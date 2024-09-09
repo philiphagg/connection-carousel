@@ -31,7 +31,7 @@ public class AppConfig {
         ServiceInstance instance2 = new ServiceInstance(URI.create("http://www.instance.two.io").toURL());
         ServiceInstance instance3 = new ServiceInstance(URI.create("http://www.instance.three.io").toURL());
         ServiceInstance instance4 = new ServiceInstance(URI.create("http://www.instance.four.io").toURL());
-        return new ServerPool( strategy, instance1, instance2, instance3, instance4);
+        return new ServerPool(strategy, instance1, instance2, instance3, instance4);
     }
 
 
