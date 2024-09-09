@@ -19,13 +19,13 @@ public class Controller {
     private final ServerPool serverPool;
 
     @GetMapping("/load-balance")
-    public ResponseEntity<String> loadBalance(@RequestParam String path) {
+    public HttpResponse loadBalance(@RequestParam String path) {
         HttpRequest request = new HttpRequest(path);
         HttpResponse response = new HttpResponse();
 
         serverPool.balanceRequest(request, response);
 
-        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        return response;
     }
 
 }
