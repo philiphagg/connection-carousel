@@ -50,8 +50,12 @@ To run Connection Carousel, you need to have Java and Maven installed on your sy
 To run the application:
 
 ```bash
-mvn spring-boot:run
+mvn clean package
+docker build -t connection-carousel .
+docker run -p 8080:8080 connection-carousel
 ```
+
+
 The application will start on http://localhost:8080
 
 To access the control panel http://localhost:8080/admin/control-panel

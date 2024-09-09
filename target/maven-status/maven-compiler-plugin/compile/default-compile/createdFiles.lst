@@ -1,0 +1,12 @@
+hagg/philip/connectioncarousel/config/AppConfig.class
+hagg/philip/connectioncarousel/ConnectionCarouselApplication.class
+hagg/philip/connectioncarousel/balance/api/Controller.class
+hagg/philip/connectioncarousel/domain/HttpRequest.class
+hagg/philip/connectioncarousel/balance/api/AdminController.class
+hagg/philip/connectioncarousel/balance/strategy/LoadBalancingStrategy.class
+hagg/philip/connectioncarousel/domain/ServiceInstance.class
+hagg/philip/connectioncarousel/domain/NoActiveStrategyException.class
+hagg/philip/connectioncarousel/balance/strategy/RoundRobinStrategy.class
+hagg/philip/connectioncarousel/balance/ServerPool.class
+hagg/philip/connectioncarousel/balance/strategy/RandomStrategy.class
+hagg/philip/connectioncarousel/domain/HttpResponse.class
